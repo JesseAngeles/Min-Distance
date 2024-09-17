@@ -4,25 +4,26 @@ function maxProbability(classes, vector)
     
     % Calcular la probabilidad para cada clase
     for i = 1:numClasses
-        % Extraer el centroide como coordenadas x, y
-        meanClass = classes(i).Centroid.Position; % Extraer las coordenadas [x, y]
-        points = classes(i).Points; % Puntos de la clase
-        covMatrix = cov(points'); % Matriz de covarianza de los puntos de la clase
-        
-        % Asegurarse de que la matriz de covarianza no sea singular
+        classPoints = classes(i).Points;  % Obtener los puntos de la clase
+        classMean = classes(i).Centroid.Position';  % Media (centroide) de la clase
+        covMatrix = covariance(classPoints);  % Calcular la matriz de covarianza
+
+        % Regularización en caso de que la matriz de covarianza sea singular
         if det(covMatrix) == 0
-            covMatrix = covMatrix + eye(size(covMatrix)) * 1e-5; % Regularización
+            covMatrix = covMatrix + eye(size(covMatrix)) * 1e-5;
         end
+        covMatrixInv = inv(covMatrix);  % Invertir la matriz de covarianza
+
+        % Diferencia entre el vector de entrada y el centroide de la clase
+        diff = vector(:) - classMean;  % Asegurarse de que ambos sean columnas
         
-        % Diferencia entre el vector y el centroide
-        diff = vector - meanClass;
-        
-        % Calcular la densidad de probabilidad de la normal multivariante
-        n = length(vector);
+        % Calcular la densidad de probabilidad de la distribución normal multivariante
+        n = length(vector);  % Dimensión del vector
         prob = (1 / ((2 * pi)^(n / 2) * sqrt(det(covMatrix)))) * ...
-               exp(-0.5 * (diff / covMatrix * diff'));
+               exp(-0.5 * (diff' * covMatrixInv * diff));  % Probabilidad
         
-        probabilities(i) = prob; % Guardar la probabilidad de esta clase
+        % Guardar la probabilidad para esta clase
+        probabilities(i) = prob;
     end
     
     % Normalizar las probabilidades para que sumen 1
@@ -31,11 +32,13 @@ function maxProbability(classes, vector)
     % Encontrar la clase con la probabilidad más alta
     [~, classIndex] = max(probabilities);
     
+    % Mostrar el resultado
     fprintf('El vector pertenece a la clase %d con la máxima probabilidad.\n', classIndex);
     disp('Probabilidades normalizadas para cada clase:');
     for i = 1:numClasses
         fprintf('Clase %d: %f\n', i, probabilities(i));
     end
 
+    % Graficar las clases y el vector
     drawer(classes, vector);
 end

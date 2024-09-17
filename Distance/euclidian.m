@@ -1,7 +1,4 @@
 function euclidian(classes, vector, radius)
-    % Función para calcular la distancia euclidiana entre un vector y los centroides de las clases
-    % y determinar si el vector pertenece a alguna clase basándose en el radio
-    
     % Comprobar si el arreglo de clases no está vacío
     if isempty(classes)
         error('El arreglo de clases está vacío.');
@@ -15,20 +12,17 @@ function euclidian(classes, vector, radius)
     
     % Calcular la distancia euclidiana desde el vector hasta cada centroide
     for i = 1:numClasses
-        % Extraer el centroide de la clase actual
-        centroid = classes(i).Centroid.Position; % Asumimos que Position es un vector [x, y]
-        
-        % Calcular la distancia euclidiana
+        centroid = classes(i).Centroid.Position;   
         distances(i) = sqrt((vector(1) - centroid(1))^2 + (vector(2) - centroid(2))^2);
     end
     
     % Determinar si el vector pertenece a alguna clase
-    minDistance = min(distances);
+    [minDist, classIndex] = min(distances);
     
-    if minDistance <= radius
-        fprintf('El vector pertenece a la clase más cercana.\n');
+    if minDist <= radius
+        fprintf('El vector pertenece a la clase %d con una distancia euclidiana de %.2f.\n', classIndex, minDist);
     else
-        fprintf('El vector no pertenece a ninguna clase.\n');
+        fprintf('El vector no pertenece a ninguna clase (distancia mínima %.2f es mayor al radio).\n', minDist);
     end
     
     % Mostrar los resultados
@@ -37,5 +31,6 @@ function euclidian(classes, vector, radius)
         fprintf('Clase %d: %.2f\n', i, distances(i));
     end
     
+    % Llamar a la función drawer para graficar
     drawer(classes, vector);
 end

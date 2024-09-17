@@ -83,6 +83,9 @@ classdef Class
             
             % Asignar puntos a la propiedad
             obj.Points = [x; y];
+            
+            % Reajustar el centroide a partir de los puntos generados
+            obj.Centroid = obj.calculateCentroid(); % Calcula el nuevo centroide a partir de los puntos
         end
         
         function centroid = calculateCentroid(obj)

@@ -17,8 +17,6 @@ option = 1;
 while option
     option = menu();
 
-    
-
     switch(option)
         case 0
             disp('bye');
@@ -32,7 +30,6 @@ while option
             mahalanobis(classes, vector, radius);
         case 5
             maxProbability(classes, vector);
-            break;
         otherwise
             disp('Invalid option. Please select again.');
     end

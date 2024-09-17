@@ -1,37 +1,22 @@
 function mahalanobis(classes, vector, radius)
-    % Función que calcula la distancia de Mahalanobis del vector a cada clase
-    % y determina a qué clase pertenece basándose en la distancia mínima.
-    
-    % Número de clases
     numClasses = length(classes);
-    
-    % Inicializar un vector para almacenar las distancias de Mahalanobis
     mahalanobisDistances = zeros(numClasses, 1);
     
     % Calcular la distancia de Mahalanobis para cada clase
     for i = 1:numClasses
-        % Obtener los puntos de la clase actual
-        classPoints = classes(i).Points; % Asumimos que Points es una matriz [2 x nElement] o similar
-        
-        % Asegurar que las dimensiones de los puntos y del vector sean correctas
-        if size(classPoints, 1) ~= length(vector)
-            error('Dimensionalidad del vector no coincide con los puntos de la clase');
-        end
+        classPoints = classes(i).Points; 
         
         % Calcular la media de la clase
-        classMean = mean(classPoints, 2); % Media por filas (x y y)
+        classMean = classes(i).Centroid.Position';
         
         % Calcular la covarianza de la clase
-        covMatrix = cov(classPoints'); % Covarianza de los puntos (transpuesta para tener [nElement x 2])
+        covMatrix = covariance(classPoints);  % Pasar solo los puntos
         
-        % Invertir la matriz de covarianza, asegurando que sea invertible
         if det(covMatrix) == 0
-            warning('La matriz de covarianza es singular. Saltando la clase %d.', i);
-            mahalanobisDistances(i) = Inf;
-            continue;
+            covMatrix = covMatrix + eye(size(covMatrix)) * 1e-5; % Regularización
         end
         covMatrixInv = inv(covMatrix);
-        
+
         % Calcular la distancia de Mahalanobis
         diff = vector(:) - classMean;  % Asegurar que el vector sea una columna
         mahalanobisDistances(i) = sqrt(diff' * covMatrixInv * diff);
